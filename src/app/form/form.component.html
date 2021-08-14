@@ -1,0 +1,142 @@
+<form class="col s12" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <app-input-field id="nome" label="nome" type="text" formControlName="nome" required [control]="form.get('nome')"
+      fieldName="nome"></app-input-field>
+    </div>
+    <div class="row">
+      <div class="input-field col s6">
+        <i class="material-icons prefix">contact_mail</i>
+        <input id="icon_contact_mail" type="email" formControlName="email" required class="validate">
+        <label for="icon_contact_mail">E-mail</label>
+        <span class="helper-text"><app-error-msg  [control]="form.get('email')" fieldName="email"></app-error-msg></span>
+        <span style="font-size:small;" *ngIf="form.get('email').status === 'PENDING'">Validando E-mail...</span>
+        <span style="font-size:small;color:green" *ngIf="form.get('email').status === 'VALID'">E-mail válido</span>
+        <span style="font-size:small;color:red"*ngIf="form.get('email').hasError('emailInvalido')">E-mail já cadastrado, por favor cadastre outro.</span>
+      </div>
+      <div class="input-field col s6">
+        <i class="material-icons prefix">contact_mail</i>
+        <input  id="confirmarEmail" type="email" formControlName="confirmarEmail" required class="validate" >
+        <label for="confirmarEmail">Confirmar E-mail</label>
+        <span *ngIf="verificarIgual()" class="helper-text termo">O E-mails devem ser iguais.</span>
+      </div>
+    </div>
+    <div class="row" formGroupName="endereco">
+      <div class="input-field col s4">
+        <i class="material-icons prefix">markunread_mailbox</i>
+        <input id="markunread_mailbox" type="number" formControlName="cep"  class="validate" required>
+        <label for="markunread_mailbox">CEP </label>
+        <span class="helper-text " ><app-error-msg  [control]="form.get('endereco.cep')" fieldName="cep"></app-error-msg></span>
+
+      </div>
+      <div class="input-field col s4">
+        <i class="material-icons prefix">dialpad</i>
+        <input id="icon_dialpad" type="number" formControlName="numero" class="validate"required>
+        <label for="icon_dialpad">Número</label>
+        <span *ngIf="!form.controls.endereco.get('numero').valid && (form.controls.endereco.get('numero').touched || form.controls.endereco.get('numero').dirty)" class="helper-text" data-error="Número é Obrigatório!" ></span>
+      </div>
+      <div class="input-field col s4">
+        <i class="material-icons prefix">description</i>
+        <input id="icon_description" type="text" formControlName="complemento" class="validate">
+        <label for="icon_description" class="active">Complemento</label>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <i class="material-icons prefix">view_day</i>
+          <input id="icon_view_day" type="text" formControlName="rua" class="validate" required>
+          <label for="icon_view_day" class="active">Rua</label>
+          <span *ngIf="!form.controls.endereco.get('rua').valid && (form.controls.endereco.get('rua').touched || form.controls.endereco.get('rua').dirty)" class="helper-text" data-error="Rua é Obrigatória!" ></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <i class="material-icons prefix">view_comfy</i>
+          <input id="icon_view_comfy" type="text" formControlName="bairro" class="validate" required>
+          <label for="icon_view_comfy" class="active">Bairro</label>
+          <span *ngIf="!form.controls.endereco.get('bairro').valid && (form.controls.endereco.get('bairro').touched || form.controls.endereco.get('bairro').dirty)" class="helper-text" data-error="Bairro é Obrigatório!" ></span>
+        </div>
+
+        <div class="input-field col s4">
+          <i class="material-icons prefix">domain</i>
+         <select id="icon_domain"  style="padding-left:10%;" formControlName="cidade" class="validate browser-default" required>
+            <option style="padding-left: 2%;" *ngFor="let cidade of cidades" [value]="cidade.nome">{{cidade.nome}}</option>
+          </select>
+          <label for="icon_domain" class="active">Cidade</label>
+           <span *ngIf="!form.controls.endereco.get('cidade').valid && (form.controls.endereco.get('cidade').touched || form.controls.endereco.get('cidade').dirty)" class="helper-text" data-error="Cidade é Obrigatória!" ></span>
+
+        </div>
+
+        <div class="input-field col s4">
+          <i class="material-icons prefix" >location_city</i>
+          <select style="padding-left:10%;" formControlName="estado" class="browser-default">
+
+              <option  *ngFor="let estado of estados" [value]="estado.sigla">{{estado.nome}}</option>
+          </select>
+          <label for="icon_location_city" class="active">Estado</label>
+         </div>
+      </div>
+
+    </div>
+    <div class="row">
+
+      <div class="input-field col s4">
+        <i class="material-icons prefix">assignment_ind</i>
+        <select id="icon_assignment_ind"  style="padding-left:10%;" formControlName="cargo" [compareWith]="compararcargo" class="browser-default">
+            <option value=""  disabled selected>Escolha um Cargo</option>
+            <option *ngFor="let cargo of cargos" [ngValue]="cargo">{{cargo.Descricao}}</option>
+        </select>
+        <label for="icon_location_city" class="active">Cargo</label>
+
+      </div>
+      <div class="input-field col s4">
+        <i class="material-icons prefix">developer_mode</i>
+        <select multiple id="icon_adeveloper_mode" style="padding-left:10%; height: max-content; margin-top: 2%;" class="browser-default"
+        formControlName="tecnologia" >
+            <option *ngFor="let tecnologia of tecnologias" [value]="tecnologia.nome">{{tecnologia.desc}}</option>
+        </select>
+        <label style="margin-bottom: 2%;" for="icon_location_city" class="active">Tecnologia</label>
+      </div>
+      <div class="input-field col s2">
+        <i class="material-icons prefix">markunread</i>
+        <br>
+
+        <p style="padding-top: 5%; float: left;" *ngFor="let newsletterOp of newsletter">
+          <label >
+            <input formControlName="newsletter" [value]="newsletterOp.valor"class="with-gap" type="radio" />
+            <span style="padding-right: 5%;">{{newsletterOp.desc}}</span>
+          </label>
+        </p>
+
+        <label>Newsletter</label>
+
+
+      </div>
+      <div class="input-field col s2">
+        <p>
+          <label>
+            <input type="checkbox" class="filled-in" formControlName="termos" checked (change)="onCheckboxChange($event)"/>
+            <span>Aceito os Termos.</span>
+          </label>
+        </p>
+        <span *ngIf="termo" class="termo" >"Por favor marque a opção "Aceite os Termos."</span>
+      </div>
+    </div>
+    <div class="row">
+    <div  class="input-field col s6">
+     <div style="margin-bottom: 2%;"> <i class="material-icons prefix">code</i> <label for="frameworks"> Frameworks</label></div>
+      <br>
+      <p id="frameworks" formArrayName="frameworks" *ngFor="let framework of FrameworksFormArray.controls; let i = index">
+         <label>
+            <input type="checkbox"  [formControlName]="i"/>
+            <span style="color:black">{{frameworksData[i].nome}}</span>
+         </label>
+      </p>
+    <span *ngIf="!form.valid" class="termo" >"Selecione ao menos uma opção acima."</span>
+    </div>
+    </div>
+    <div class="row">
+    <button class="waves-effect waves-light btn" type="submit" style="margin-right: 2%;" ><i class="material-icons right">send</i>Enviar</button>
+    <button class="waves-effect waves-light btn" (click)="reset()" ><i class="material-icons right">cancel</i>Cancelar</button>
+    </div>
+
+  </form>
+
